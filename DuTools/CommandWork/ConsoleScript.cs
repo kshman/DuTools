@@ -1,6 +1,6 @@
 ﻿namespace DuTools.CommandWork;
 
-internal class ConsoleScript : IDisposable
+public class ConsoleScript : IDisposable
 {
 	public string FileName { get; private set; } = string.Empty;
 	public string TempFileName { get; private set; } = string.Empty;

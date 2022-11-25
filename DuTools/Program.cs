@@ -18,14 +18,15 @@ internal static class Program
 	{
 		var prm = string.Empty;
 		var cmd = GetCommand(Environment.GetCommandLineArgs(), ref prm);
+		object? obj = null;
 
-		if (cmd == CommandList.DuConsole && TestDuConsole(prm))
+		if (cmd == CommandList.DuConsole && TestDuConsole(prm, ref obj))
 			return;
 
 		// To customize application configuration such as set high DPI settings or default font,
 		// see https://aka.ms/applicationconfiguration.
 		ApplicationConfiguration.Initialize();
-		Application.Run(new FrontForm());
+		Application.Run(new FrontForm(obj));
 	}
 
 	public static CommandList GetCommand(string[] arg, ref string param)
@@ -65,7 +66,7 @@ internal static class Program
 		return CommandList.OhNo;
 	}
 
-	public static bool TestDuConsole(string filename)
+	public static bool TestDuConsole(string filename, ref object? obj)
 	{
 		if (string.IsNullOrWhiteSpace(filename))
 			return false;
@@ -75,7 +76,10 @@ internal static class Program
 			return false;
 
 		if (!cs.RunAs || TestEnv.IsAdministrator)
+		{
+			obj = cs;
 			return false;
+		}
 
 		var ps = new Process();
 		ps.StartInfo.FileName = Application.ExecutablePath;

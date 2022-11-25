@@ -29,15 +29,17 @@
 		private void InitializeComponent()
 		{
 			this.panel1 = new System.Windows.Forms.Panel();
+			this.OutputText = new System.Windows.Forms.RichTextBox();
 			this.DoItButton = new Du.WinForms.BadakButton();
 			this.TitleLabel = new System.Windows.Forms.Label();
-			this.OutputText = new System.Windows.Forms.RichTextBox();
+			this.ScriptInfoText = new System.Windows.Forms.TextBox();
 			this.panel1.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// panel1
 			// 
 			this.panel1.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(30)))), ((int)(((byte)(30)))), ((int)(((byte)(30)))));
+			this.panel1.Controls.Add(this.ScriptInfoText);
 			this.panel1.Controls.Add(this.OutputText);
 			this.panel1.Controls.Add(this.DoItButton);
 			this.panel1.Controls.Add(this.TitleLabel);
@@ -47,6 +49,20 @@
 			this.panel1.Name = "panel1";
 			this.panel1.Size = new System.Drawing.Size(634, 384);
 			this.panel1.TabIndex = 0;
+			// 
+			// OutputText
+			// 
+			this.OutputText.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.OutputText.BackColor = System.Drawing.Color.FloralWhite;
+			this.OutputText.Location = new System.Drawing.Point(4, 71);
+			this.OutputText.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
+			this.OutputText.Name = "OutputText";
+			this.OutputText.ReadOnly = true;
+			this.OutputText.Size = new System.Drawing.Size(627, 310);
+			this.OutputText.TabIndex = 2;
+			this.OutputText.Text = "";
 			// 
 			// DoItButton
 			// 
@@ -76,19 +92,17 @@
 			this.TitleLabel.TabIndex = 0;
 			this.TitleLabel.Text = "(스크립트가 없어여)";
 			// 
-			// OutputText
+			// ScriptInfoText
 			// 
-			this.OutputText.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
-            | System.Windows.Forms.AnchorStyles.Left) 
+			this.ScriptInfoText.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-			this.OutputText.BackColor = System.Drawing.Color.FloralWhite;
-			this.OutputText.Location = new System.Drawing.Point(4, 46);
-			this.OutputText.Margin = new System.Windows.Forms.Padding(2, 3, 2, 3);
-			this.OutputText.Name = "OutputText";
-			this.OutputText.ReadOnly = true;
-			this.OutputText.Size = new System.Drawing.Size(627, 335);
-			this.OutputText.TabIndex = 2;
-			this.OutputText.Text = "";
+			this.ScriptInfoText.BackColor = System.Drawing.Color.Thistle;
+			this.ScriptInfoText.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.ScriptInfoText.Location = new System.Drawing.Point(4, 46);
+			this.ScriptInfoText.Name = "ScriptInfoText";
+			this.ScriptInfoText.ReadOnly = true;
+			this.ScriptInfoText.Size = new System.Drawing.Size(627, 24);
+			this.ScriptInfoText.TabIndex = 3;
 			// 
 			// DuConsoleForm
 			// 
@@ -113,5 +127,6 @@
 		private BadakButton DoItButton;
 		private Label TitleLabel;
 		private RichTextBox OutputText;
+		private TextBox ScriptInfoText;
 	}
 }

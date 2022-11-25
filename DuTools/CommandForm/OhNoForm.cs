@@ -4,13 +4,6 @@ namespace DuTools.CommandForm;
 
 public partial class OhNoForm : Form
 {
-	private static OhNoForm? _instance;
-
-	public static OhNoForm Instance
-	{
-		get { return _instance ??= new OhNoForm(); }
-	}
-
 	public OhNoForm()
 	{
 		InitializeComponent();

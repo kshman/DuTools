@@ -96,8 +96,7 @@
 			// 
 			// RunAsLabel
 			// 
-			this.RunAsLabel.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
+			this.RunAsLabel.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
 			this.RunAsLabel.AutoSize = true;
 			this.RunAsLabel.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
 			this.RunAsLabel.ForeColor = System.Drawing.Color.Red;
@@ -221,6 +220,7 @@
 			// 
 			// FrontForm
 			// 
+			this.AllowDrop = true;
 			this.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(60)))), ((int)(((byte)(60)))), ((int)(((byte)(60)))));
 			this.ClientSize = new System.Drawing.Size(650, 440);
 			this.Controls.Add(this.WorkPanel);
@@ -236,6 +236,8 @@
 			this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.FrontForm_FormClosing);
 			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.FrontForm_FormClosed);
 			this.Load += new System.EventHandler(this.FrontForm_Load);
+			this.DragDrop += new System.Windows.Forms.DragEventHandler(this.FrontForm_DragDrop);
+			this.DragEnter += new System.Windows.Forms.DragEventHandler(this.FrontForm_DragEnter);
 			this.KeyDown += new System.Windows.Forms.KeyEventHandler(this.FrontForm_KeyDown);
 			this.Layout += new System.Windows.Forms.LayoutEventHandler(this.FrontForm_Layout);
 			this.TopPanel.ResumeLayout(false);

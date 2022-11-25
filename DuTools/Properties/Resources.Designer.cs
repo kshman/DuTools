@@ -106,6 +106,15 @@ namespace DuTools.Properties {
         }
         
         /// <summary>
+        ///   파일이름: 과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string FileNameWith {
+            get {
+                return ResourceManager.GetString("FileNameWith", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   System.Drawing.Bitmap 형식의 지역화된 리소스를 찾습니다.
         /// </summary>
         internal static System.Drawing.Bitmap icon_cmd_Calculator {
@@ -187,6 +196,15 @@ namespace DuTools.Properties {
         internal static string Open {
             get {
                 return ResourceManager.GetString("Open", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   스크립트부터 열어주세요과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string OpenConsoleScriptPlease {
+            get {
+                return ResourceManager.GetString("OpenConsoleScriptPlease", resourceCulture);
             }
         }
         

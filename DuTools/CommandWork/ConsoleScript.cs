@@ -1,50 +1,29 @@
-﻿namespace DuTools.CommandWork;
+﻿using System.ComponentModel;
 
-public class ConsoleScript : IDisposable
+namespace DuTools.CommandWork;
+
+public class ConsoleScript
 {
+	private string[]? _lines;
+
 	public string FileName { get; private set; } = string.Empty;
 	public string TempFileName { get; private set; } = string.Empty;
 
-	public string Name { get; private set; } = string.Empty;
+	public string Name { get; set; } = string.Empty;
 	public ConsoleType Type { get; private set; } = ConsoleType.Unknown;
-	public bool StartOnLoad { get; private set; }
-	public bool RunAs { get; private set; }
-	public bool AutoExit { get; private set; }
+	public bool StartOnLoad { get; set; }
+	public bool RunAs { get; set; }
+	public bool AutoExit { get; set; }
 
-	public string[]? Lines { get; private set; }
-	public string? Context { get; private set; }
+	public string[]? Context { get; private set; }
 
 	private ConsoleScript()
 	{
 	}
 
-	private bool _is_disposed;
-
-	public void Dispose()
-	{
-		Dispose(true);
-		GC.SuppressFinalize(this);
-	}
-
-	protected virtual void Dispose(bool disposing)
-	{
-		if (!disposing)
-			return;
-		if (_is_disposed)
-			return;
-
-		_is_disposed = true;
-		Close();
-	}
-
-	public void Close()
-	{
-		UnlinkTempContext();
-	}
-
 	public static ConsoleScript? FromFile(string filename)
 	{
-		if (string.IsNullOrEmpty(filename))
+		if (string.IsNullOrWhiteSpace(filename))
 			return null;
 
 		try
@@ -92,14 +71,8 @@ public class ConsoleScript : IDisposable
 		if (string.IsNullOrEmpty(FileName))
 			return false;
 
-		Lines = File.ReadAllLines(FileName, ConsoleTypeToEncoding(Type));
-
-		var sb = new StringBuilder();
-
-		foreach (var l in Lines)
-			sb.AppendLine(l);
-
-		Context = sb.ToString();
+		_lines = File.ReadAllLines(FileName, ConsoleTypeToEncoding(Type));
+		Context = _lines;
 
 		return true;
 	}
@@ -109,53 +82,50 @@ public class ConsoleScript : IDisposable
 		if (string.IsNullOrEmpty(FileName))
 			return false;
 
-		Lines = File.ReadAllLines(FileName);
+		_lines = File.ReadAllLines(FileName);
 
-		var ctx = new StringBuilder();
-		var scp = new StringBuilder();
+		var dbs = LineDb.Empty();
+		var ctx = new List<string>();
 		var isdb = true;
 
-		foreach (var l in Lines)
+		foreach (var l in _lines)
 		{
 			if (!isdb)
-				scp.AppendLine(l);
+				ctx.Add(l);
 			else if (l.Length == 0)
 				isdb = false;
 			else
-				ctx.AppendLine(l);
+				dbs.AddFromContext(l);
 		}
 
-		if (scp.Length == 0)
+		if (dbs.Count == 0 || ctx.Count == 0)
 			return false;
 
-		Context = scp.ToString();
+		Context = ctx.ToArray();
 
-		if (ctx.Length <= 0)
-			return false;
-
-		var db = LineDb.FromContext(ctx.ToString());
-
-		Name = db.Get("name") ?? FileName;
-		Type = StringToConsoleType(db.Get("type"));
-		StartOnLoad = Converter.ToBool(db.Get("start"), StartOnLoad);
-		RunAs = Converter.ToBool(db.Get("runas"), RunAs);
-		AutoExit = Converter.ToBool(db.Get("autoexit"), AutoExit);
+		Name = dbs.Get("name") ?? FileName;
+		Type = StringToConsoleType(dbs.Get("type"));
+		StartOnLoad = Converter.ToBool(dbs.Get("start"), StartOnLoad);
+		RunAs = Converter.ToBool(dbs.Get("runas"), RunAs);
+		AutoExit = Converter.ToBool(dbs.Get("autoexit"), AutoExit);
 
 		return true;
 	}
 
-	public void MakeTempContext()
+	public void PrepareTempContext()
 	{
-		if (string.IsNullOrEmpty(Context) || !string.IsNullOrEmpty(TempFileName))
+		if (Context == null || Context.Length == 0 || !string.IsNullOrWhiteSpace(TempFileName))
 			return;
 
 		var ext = ConsoleTypeToExtension(Type);
 		TempFileName = $"{Path.GetTempPath()}\\DuConsole_{UnixTime.Tick}.{ext}";
+
+		var merge = string.Join("\r\n", Context);
 		var encoding = ConsoleTypeToEncoding(Type);
-		File.WriteAllText(TempFileName, Context, encoding);
+		File.WriteAllText(TempFileName, merge, encoding);
 	}
 
-	private void UnlinkTempContext()
+	public void CleanUpTempContext()
 	{
 		if (string.IsNullOrEmpty(TempFileName) || !File.Exists(TempFileName))
 			return;
@@ -164,16 +134,28 @@ public class ConsoleScript : IDisposable
 		TempFileName = string.Empty;
 	}
 
-	private static ConsoleType DetectConsoleType(FileInfo fileinfo)
+	public string GetFileNameOnly()
+	{
+		if (string.IsNullOrWhiteSpace(FileName))
+			return string.Empty;
+
+		var fi = new FileInfo(FileName);
+		return fi.Name;
+	}
+
+	public static ConsoleType DetectConsoleType(FileSystemInfo fileinfo)
 	{
 		return fileinfo.Extension.ToLower() switch
 		{
 			".duc" or ".duconsole" => ConsoleType.Console,
-			".cmd" => ConsoleType.Cmd,
+			".cmd" or ".bat" => ConsoleType.Cmd,
 			".ps1" or ".pwsh" => ConsoleType.PowerShell,
 			_ => ConsoleType.Unknown,
 		};
 	}
+
+	public static ConsoleType DetectConsoleType(string filename)
+		=> DetectConsoleType(new FileInfo(filename));
 
 	public static ConsoleType StringToConsoleType(string? value)
 	{
@@ -182,7 +164,7 @@ public class ConsoleScript : IDisposable
 
 		return value.ToLower() switch
 		{
-			"cmd" => ConsoleType.Cmd,
+			"cmd" or "bat" => ConsoleType.Cmd,
 			"ps" or "ps1" or "powershell" => ConsoleType.PowerShell,
 			_ => ConsoleType.Unknown,
 		};
@@ -248,8 +230,12 @@ public class ConsoleScript : IDisposable
 
 public enum ConsoleType
 {
+	[Description("알수없음")]
 	Unknown,
+	[Description("콘설")]
 	Console,
+	[Description("커맨드")]
 	Cmd,
+	[Description("파워쉘")]
 	PowerShell,
 }

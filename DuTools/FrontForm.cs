@@ -9,6 +9,7 @@ public partial class FrontForm : Form
 	private readonly BadakFormWorker _bfw;
 
 	private readonly object? _start_obj;
+	private Form? _active_form;
 
 	private readonly Font _recent_button_font;
 	private readonly List<BadakButton> _recent_buttons = new();
@@ -24,7 +25,6 @@ public partial class FrontForm : Form
 				throw new InvalidOperationException("메인 인스턴스가 없다니 이게 무슨 말이오");
 			return _instance;
 		}
-		private set => _instance = value;
 	}
 
 	//
@@ -65,13 +65,14 @@ public partial class FrontForm : Form
 
 		if (_start_obj is CommandWork.ConsoleScript cs)
 		{
-			var form = CommandForm.DuConsoleForm.Instance;
+			AddRecentlyCommand(CommandList.DuConsole);
+			var form = new CommandForm.DuConsoleForm();
 			SetActiveForm(form);
-			form.PrepareScript(cs);
+			form.HotScript(cs);
 			return;
 		}
 
-		SetActiveForm(CommandForm.OhNoForm.Instance);
+		SetActiveForm(new CommandForm.OhNoForm());
 	}
 
 	private void FrontForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -128,9 +129,29 @@ public partial class FrontForm : Form
 	{
 		if (e.KeyCode == Keys.Escape)
 		{
-			if (CommandForm.DuConsoleForm.HasInstance)
-				CommandForm.DuConsoleForm.Instance.WaitProcess();
+			if (_active_form is CommandForm.DuConsoleForm ducform)
+				ducform.WaitProcess();
 			Close();
+		}
+	}
+
+	private void FrontForm_DragEnter(object sender, DragEventArgs e)
+	{
+		e.Effect = e.Data != null && e.Data.GetDataPresent(DataFormats.FileDrop) ?
+			DragDropEffects.Link : DragDropEffects.None;
+	}
+
+	private void FrontForm_DragDrop(object sender, DragEventArgs e)
+	{
+		if (e.Data?.GetData(DataFormats.FileDrop) is string[] { Length: > 0 } filenames)
+		{
+			if (CommandForm.DuConsoleForm.IsCanDrop(filenames[0]))
+			{
+				AddRecentlyCommand(CommandList.DuConsole);
+				var form = new CommandForm.DuConsoleForm();
+				SetActiveForm(form);
+				form.HotScript(filenames[0]);
+			}
 		}
 	}
 	#endregion
@@ -138,23 +159,26 @@ public partial class FrontForm : Form
 	#region 메뉴아이템
 	private void CalculatorMenuItem_Click(object? sender, EventArgs e)
 	{
-		AddRecentlyCommand(CommandList.Calculator);
+		if (AddRecentlyCommand(CommandList.Calculator))
+			SetActiveForm(new CommandForm.OhNoForm());
 	}
 
 	private void Converter1MenuItem_Click(object? sender, EventArgs e)
 	{
-		AddRecentlyCommand(CommandList.Converter1);
+		if (AddRecentlyCommand(CommandList.Converter1))
+			SetActiveForm(new CommandForm.OhNoForm());
 	}
 
 	private void DuConsoleMenuItem_Click(object? sender, EventArgs e)
 	{
 		if (AddRecentlyCommand(CommandList.DuConsole))
-			SetActiveForm(CommandForm.DuConsoleForm.Instance);
+			SetActiveForm(new CommandForm.DuConsoleForm());
 	}
 
 	private void DuGetBlogMenuItem_Click(object? sender, EventArgs e)
 	{
-		AddRecentlyCommand(CommandList.DuGetBlog);
+		if (AddRecentlyCommand(CommandList.DuGetBlog))
+			SetActiveForm(new CommandForm.OhNoForm());
 	}
 
 	// 확장자 등록
@@ -246,15 +270,15 @@ public partial class FrontForm : Form
 
 			x += 84;
 		}
-	} 
+	}
 	#endregion
 
 	private void SetActiveForm(Form form)
 	{
+		_active_form?.Close();
+		_active_form = form;
+
 		WorkPanel.Controls.Clear();
 		WorkPanel.Controls.Add(form.Controls[0]);
 	}
-
-	public static void InvokeAction(Action action)
-		=> _instance?.Invoke(action);
 }

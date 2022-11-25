@@ -1,61 +1,41 @@
-﻿using DuTools.Properties;
+﻿using DuTools.CommandWork;
+using DuTools.Properties;
 
 namespace DuTools.CommandForm;
 
 public partial class DuConsoleForm : Form
 {
-	private static DuConsoleForm? _instance;
-
 	private CommandWork.ConsoleScript? _cs;
 	private Process? _ps;
 
-	private string _filename = string.Empty;
-
-	public static DuConsoleForm Instance
-	{
-		get { return _instance ??= new DuConsoleForm(); }
-	}
-
-	public static bool HasInstance => _instance != null;
-
-	private DuConsoleForm()
+	#region 컨스트럭터 + 폼 메시지
+	public DuConsoleForm()
 	{
 		InitializeComponent();
 	}
 
 	private void DuConsoleForm_Load(object sender, EventArgs e)
 	{
-		if (!PrepareScript())
-		{
-			// 이게 참이었으면 prepare안에서 실행한것임
-			if (_cs == null)
-				LogLine(Color.SeaGreen, "스크립트부터 열면 안될깝쇼?");
-			else
-			{
-				_cs.MakeTempContext();
-				LogLine(Color.Blue, $"{_filename}{Environment.NewLine}");
-				if (_cs.Lines != null)
-					foreach (var l in _cs.Lines)
-						LogLine(Color.Teal, l, false);
-			}
-		}
+		// 단순히 UI 초기화용이다. 실제로 스크립드 준비하는게 아님
+		PrepareScript();
 	}
 
 	private void DuConsoleForm_FormClosed(object sender, FormClosedEventArgs e)
 	{
 		_ps?.Kill();
-		_cs?.Close();
 	}
 
 	private void DoItButton_Click(object sender, EventArgs e)
 	{
 		DoIt();
 	}
+	#endregion
 
+	#region 텍스트 출력 처리
 	private void InvokeText(string? text, bool scroll = true)
 	{
 		if (!string.IsNullOrEmpty(text))
-			FrontForm.InvokeAction(() =>
+			OutputText.Invoke(() =>
 			{
 				OutputText.AppendText(text);
 				if (scroll)
@@ -66,7 +46,7 @@ public partial class DuConsoleForm : Form
 	private void InvokeText(Color color, string? text, bool scroll = true)
 	{
 		if (!string.IsNullOrEmpty(text))
-			FrontForm.InvokeAction(() =>
+			OutputText.Invoke(() =>
 			{
 				OutputText.SelectionColor = color;
 				OutputText.SelectionStart = OutputText.TextLength;
@@ -103,6 +83,73 @@ public partial class DuConsoleForm : Form
 			InvokeText(text, scroll);
 	}
 	*/
+	#endregion
+
+	public bool ReadScript(string filename)
+	{
+		var cs = CommandWork.ConsoleScript.FromFile(filename);
+
+		if (cs == null)
+		{
+			LogText(Color.Red, Resources.CannotReadConsoleScript);
+			LogLine($"{Resources.FileNameWith}{filename}");
+			return false;
+		}
+
+		if (cs.RunAs && !TestEnv.IsAdministrator)
+		{
+			// RUNAS!
+			RunAs(filename);
+			FrontForm.Instance.Close();
+			return false;
+		}
+
+		Configs.LastFolderFromFilename(filename);
+		_cs = cs;
+
+		return true;
+	}
+
+	private bool PrepareScript()
+	{
+		if (_cs == null)
+		{
+			TitleLabel.Text = Resources.NoConsoleScript;
+			DoItButton.Text = Resources.Open;
+			ScriptInfoText.Text = Resources.OpenConsoleScriptPlease;
+
+			return false;
+		}
+
+		Configs.LastFolderFromFilename(_cs.FileName);
+
+		TitleLabel.Text = _cs.Name;
+		DoItButton.Text = Resources.DoIt;
+
+		StringBuilder sb = new();
+		sb.Append(_cs.GetFileNameOnly());
+		sb.Append($" / 형식: {_cs.Type.GetDescription()}");
+		if (_cs.RunAs)
+			sb.Append(" / 관리자");
+		if (_cs.StartOnLoad)
+			sb.Append(" / 바로시작");
+		if (_cs.AutoExit)
+			sb.Append(" / 끝나면 종료");
+		ScriptInfoText.Text = sb.ToString();
+
+		if (_cs.StartOnLoad)
+		{
+			TaskIt();
+
+			return true;
+		}
+
+		if (_cs.Context != null)
+			foreach (var l in _cs.Context)
+				LogLine(Color.Teal, l, false);
+
+		return false;
+	}
 
 	private void DoIt()
 	{
@@ -125,95 +172,7 @@ public partial class DuConsoleForm : Form
 		if (dlg.ShowDialog() != DialogResult.OK)
 			return;
 
-		Configs.LastFolderFromFilename(dlg.FileName);
-		OutputText.Clear();
-
-		_cs = ReadScript(dlg.FileName);
-		PrepareScript();
-	}
-
-	/*
-	private void CloseIt()
-	{
-		if (_cs == null)
-			return;
-
-		WaitProcess();
-
-		_cs.Close();
-		_cs = null;
-
-		PrepareScript();
-
-		OutputText.Clear();
-		LogLine(Color.DarkKhaki, "[스크립트가 끝났습니다]");
-	}
-	*/
-
-	public void WaitProcess()
-	{
-		_ps?.WaitForExit();
-	}
-
-	public CommandWork.ConsoleScript? ReadScript(string filename)
-	{
-		var cs = CommandWork.ConsoleScript.FromFile(filename);
-
-		if (cs == null)
-		{
-			LogText(Color.Red, Resources.CannotReadConsoleScript, false);
-			LogLine(filename);
-			return null;
-		}
-
-		if (cs.RunAs && !TestEnv.IsAdministrator)
-		{
-			// RUNAS!
-			RunAs(filename);
-			FrontForm.Instance.Close();
-			return null;
-		}
-
-		cs.MakeTempContext();
-		LogLine(Color.Blue, $"{filename}{Environment.NewLine}");
-		if (cs.Lines != null)
-			foreach (var l in cs.Lines)
-				LogLine(Color.Teal, l, false);
-
-		return cs;
-	}
-
-	public bool PrepareScript(CommandWork.ConsoleScript? cs)
-	{
-		_cs = cs;
-		return PrepareScript();
-	}
-
-	private bool PrepareScript()
-	{
-		if (_cs == null)
-		{
-			TitleLabel.Text = Resources.NoConsoleScript;
-			DoItButton.Text = Resources.Open;
-
-			_filename = string.Empty;
-
-			return false;
-		}
-
-		TitleLabel.Text = _cs.Name;
-		DoItButton.Text = Resources.DoIt;
-
-		_filename = _cs.FileName;
-		Configs.LastFolderFromFilename(_cs.FileName);
-
-		if (!_cs.StartOnLoad)
-			return false;
-
-		_cs.MakeTempContext();
-		TaskIt();
-
-		return true;
+		HotScript(dlg.FileName);
 	}
 
 	public void TaskIt()
@@ -240,7 +199,9 @@ public partial class DuConsoleForm : Form
 			return;
 		}
 
-		_ps = new();
+		_cs.PrepareTempContext();
+
+		_ps = new Process();
 		_ps.StartInfo.FileName = runtime;
 		_ps.StartInfo.Arguments = $"{argument} {_cs.TempFileName}";
 		_ps.StartInfo.UseShellExecute = false;
@@ -252,7 +213,14 @@ public partial class DuConsoleForm : Form
 
 		_ps.EnableRaisingEvents = true;
 		_ps.OutputDataReceived += (_, e) => LogLine(e.Data);
-		_ps.ErrorDataReceived += (_, e) => LogLine(Color.Red, e.Data);
+		_ps.ErrorDataReceived += (_, e) =>
+		{
+			if (e.Data != null)
+			{
+				_cs.AutoExit = false;
+				LogLine(Color.Red, e.Data);
+			}
+		};
 		_ps.Exited += (_, _) => ProcessExited();
 
 		_ps.Start();
@@ -268,6 +236,7 @@ public partial class DuConsoleForm : Form
 			exitcode = 0;
 		else
 		{
+			//Task.Delay(100);
 			Thread.Sleep(100);
 
 			exitcode = _ps.ExitCode;
@@ -281,35 +250,57 @@ public partial class DuConsoleForm : Form
 		//Debug.WriteLine($"Exit code: {exitcode}");
 
 		//
-		if (!DoItButton.InvokeRequired)
-			DoItButton.Enabled = true;
-		else
-			DoItButton.Invoke(new Action(() => DoItButton.Enabled = true));
+		DoItButton.Invoke(() => DoItButton.Enabled = true);
 
-		AutoExitIt();
-	}
+		// 아니 이게 여기서 널 일리가 없는데, 왤케 검사하라고 함
+		if (_cs == null)
+			return;
 
-	private void AutoExitIt()
-	{
-		if (_cs is not { AutoExit: true })
+		_cs.CleanUpTempContext();
+
+		// 탈출
+		if (!_cs.AutoExit || _cs.AutoExit && exitcode != 0)
 			return;
 
 		Task.Run(() =>
 		{
-			Task.Delay(1000);
-			Invoke(() => FrontForm.Instance.Close());
+			//Task.Delay(100);
+			Thread.Sleep(100);
+			FrontForm.Instance.Invoke(() => FrontForm.Instance.Close());
 		}).Wait();
+	}
+
+	public void WaitProcess()
+	{
+		_ps?.WaitForExit();
+	}
+
+	public bool HotScript(CommandWork.ConsoleScript? cs)
+	{
+		_cs = cs;
+		return PrepareScript();
+	}
+
+	public bool HotScript(string filename)
+	{
+		OutputText.Clear();
+
+		ReadScript(filename);
+		return PrepareScript();
 	}
 
 	public static void RunAs(string filename)
 	{
 		var ps = new Process();
 		ps.StartInfo.FileName = Application.ExecutablePath;
-		ps.StartInfo.Arguments = filename;
+		ps.StartInfo.Arguments = $"-duconsole=\"{filename}\"";
 		ps.StartInfo.WorkingDirectory = Application.StartupPath;
 		ps.StartInfo.UseShellExecute = true;
 		ps.StartInfo.Verb = "runas";
 		ps.Start();
 	}
+
+	public static bool IsCanDrop(string filename)
+		=> CommandWork.ConsoleScript.DetectConsoleType(filename) != ConsoleType.Unknown;
 }
 

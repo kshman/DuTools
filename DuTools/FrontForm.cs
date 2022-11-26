@@ -1,3 +1,4 @@
+using DuTools.CommandWork.DuConsole;
 using DuTools.Properties;
 
 namespace DuTools;
@@ -8,6 +9,7 @@ public partial class FrontForm : Form
 
 	private readonly BadakFormWorker _bfw;
 
+	private readonly CommandList _start_cmd;
 	private readonly object? _start_obj;
 	private Form? _active_form;
 
@@ -28,7 +30,7 @@ public partial class FrontForm : Form
 	}
 
 	//
-	public FrontForm(object? obj = null)
+	public FrontForm(CommandList cmd, object? obj = null)
 	{
 		_instance ??= this;
 
@@ -53,6 +55,7 @@ public partial class FrontForm : Form
 		_recent_events.Add(CommandList.DuGetBlog, DuGetBlogMenuItem_Click);
 
 		//
+		_start_cmd = cmd;
 		_start_obj = obj;
 	}
 	#endregion
@@ -63,16 +66,30 @@ public partial class FrontForm : Form
 		Configs.AtOnLoad(this);
 		RefreshRecentlyCommand();
 
-		if (_start_obj is CommandWork.ConsoleScript cs)
+		switch (_start_cmd)
 		{
-			AddRecentlyCommand(CommandList.DuConsole);
-			var form = new CommandForm.DuConsoleForm();
-			SetActiveForm(form);
-			form.HotScript(cs);
-			return;
-		}
+			case CommandList.DuConsole when _start_obj is ConsoleScript cs:
+				{
+					AddRecentlyCommand(CommandList.DuConsole);
+					var form = new CommandForm.DuConsoleForm();
+					SetActiveForm(form);
+					form.HotScript(cs);
+				}
+				break;
 
-		SetActiveForm(new CommandForm.OhNoForm());
+			case CommandList.DuGetBlog:
+				AddRecentlyCommand(CommandList.DuGetBlog);
+				SetActiveForm(new CommandForm.DuGetBlogForm());
+				break;
+
+			case CommandList.OhNo:
+			case CommandList.Calculator:
+			case CommandList.Converter1:
+			default:
+				// 기본은 암것도 안 띄움
+				SetActiveForm(new CommandForm.OhNoForm());
+				break;
+		}
 	}
 
 	private void FrontForm_FormClosing(object sender, FormClosingEventArgs e)
@@ -178,7 +195,7 @@ public partial class FrontForm : Form
 	private void DuGetBlogMenuItem_Click(object? sender, EventArgs e)
 	{
 		if (AddRecentlyCommand(CommandList.DuGetBlog))
-			SetActiveForm(new CommandForm.OhNoForm());
+			SetActiveForm(new CommandForm.DuGetBlogForm());
 	}
 
 	// 확장자 등록
@@ -187,8 +204,8 @@ public partial class FrontForm : Form
 		if (MsgBox(Resources.RegisterExtensionsDuConsole) == DialogResult.Yes)
 		{
 			// DuConsole
-			RegKey.RegisterExtension(".duc", "DuConsole.duc", "DuConsole script", Application.ExecutablePath);
-			RegKey.RegisterExtension(".duconsole", "DuConsole.duconsole", "DuConsole script", Application.ExecutablePath);
+			RegKey.RegisterExtensionWith(".duc", "DuConsole.duc", "DuConsole script", Application.ExecutablePath, "-duconsole=", null);
+			RegKey.RegisterExtensionWith(".duconsole", "DuConsole.duconsole", "DuConsole script", Application.ExecutablePath, "-duconsole=", null);
 		}
 
 		if (MsgBox(Resources.RegisterExtensionsOthers) == DialogResult.Yes)

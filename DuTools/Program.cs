@@ -5,6 +5,7 @@ global using Du.Data;
 global using Du.Globalization;
 global using Du.Platform;
 global using Du.WinForms;
+using DuTools.CommandWork.DuConsole;
 
 namespace DuTools;
 
@@ -26,7 +27,7 @@ internal static class Program
 		// To customize application configuration such as set high DPI settings or default font,
 		// see https://aka.ms/applicationconfiguration.
 		ApplicationConfiguration.Initialize();
-		Application.Run(new FrontForm(obj));
+		Application.Run(new FrontForm(cmd, obj));
 	}
 
 	public static CommandList GetCommand(string[] arg, ref string param)
@@ -58,7 +59,7 @@ internal static class Program
 					return CommandList.Converter1;
 				case "duconsole" or "duc":
 					return CommandList.DuConsole;
-				case "dugetblog" or "dugethttp":
+				case "dugetblog" or "dugethttp" or "blog":
 					return CommandList.DuGetBlog;
 			}
 		}
@@ -71,7 +72,7 @@ internal static class Program
 		if (string.IsNullOrWhiteSpace(filename))
 			return false;
 
-		var cs = CommandWork.ConsoleScript.FromFile(filename);
+		var cs = ConsoleScript.FromFile(filename);
 		if (cs == null)
 			return false;
 

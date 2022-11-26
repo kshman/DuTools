@@ -129,6 +129,9 @@
   <data name="ConsoleScriptFilter" xml:space="preserve">
     <value>콘솔 스크립트|*.duc;*.duconsole;*.cmd;*.ps1|모든 파일|*.*</value>
   </data>
+  <data name="DefaultBookName" xml:space="preserve">
+    <value>DuBook</value>
+  </data>
   <data name="DoIt" xml:space="preserve">
     <value>합시다</value>
   </data>
@@ -154,11 +157,20 @@
   <data name="LetMeKnow" xml:space="preserve">
     <value>알려주세여!</value>
   </data>
+  <data name="NoBookName" xml:space="preserve">
+    <value>책 이름을 써주세요! 파일 이름으로 사용해요</value>
+  </data>
   <data name="NoConsoleScript" xml:space="preserve">
     <value>[콘솔 스크립트가 없어요]</value>
   </data>
   <data name="NoConsoleScriptOpenFirst" xml:space="preserve">
     <value>콘솔 스크립트가 없어요. 먼저 여세요</value>
+  </data>
+  <data name="NoSupportBlogSite" xml:space="preserve">
+    <value>지원하지 않는 블로그 사이트예요!</value>
+  </data>
+  <data name="NoUrlAddress" xml:space="preserve">
+    <value>URL 주소가 없어요</value>
   </data>
   <data name="Open" xml:space="preserve">
     <value>열기</value>

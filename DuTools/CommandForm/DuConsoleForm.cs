@@ -1,28 +1,20 @@
-﻿using DuTools.CommandWork;
+﻿using DuTools.CommandWork.DuConsole;
 using DuTools.Properties;
 
 namespace DuTools.CommandForm;
 
 public partial class DuConsoleForm : Form
 {
-	private CommandWork.ConsoleScript? _cs;
+	private ConsoleScript? _cs;
 	private Process? _ps;
 
 	#region 컨스트럭터 + 폼 메시지
 	public DuConsoleForm()
 	{
 		InitializeComponent();
-	}
 
-	private void DuConsoleForm_Load(object sender, EventArgs e)
-	{
 		// 단순히 UI 초기화용이다. 실제로 스크립드 준비하는게 아님
 		PrepareScript();
-	}
-
-	private void DuConsoleForm_FormClosed(object sender, FormClosedEventArgs e)
-	{
-		_ps?.Kill();
 	}
 
 	private void DoItButton_Click(object sender, EventArgs e)
@@ -87,7 +79,7 @@ public partial class DuConsoleForm : Form
 
 	public bool ReadScript(string filename)
 	{
-		var cs = CommandWork.ConsoleScript.FromFile(filename);
+		var cs = ConsoleScript.FromFile(filename);
 
 		if (cs == null)
 		{
@@ -193,7 +185,7 @@ public partial class DuConsoleForm : Form
 		if (_ps != null)
 			return;
 
-		if (!CommandWork.ConsoleScript.ConsoleTypeToRuntime(_cs.Type, out var runtime, out var argument))
+		if (!ConsoleScript.ConsoleTypeToRuntime(_cs.Type, out var runtime, out var argument))
 		{
 			LogLine(Color.Red, $"{Resources.InvalidConsoleRuntime}{_cs.Type}");
 			return;
@@ -275,7 +267,7 @@ public partial class DuConsoleForm : Form
 		_ps?.WaitForExit();
 	}
 
-	public bool HotScript(CommandWork.ConsoleScript? cs)
+	public bool HotScript(ConsoleScript? cs)
 	{
 		_cs = cs;
 		return PrepareScript();
@@ -301,6 +293,6 @@ public partial class DuConsoleForm : Form
 	}
 
 	public static bool IsCanDrop(string filename)
-		=> CommandWork.ConsoleScript.DetectConsoleType(filename) != ConsoleType.Unknown;
+		=> ConsoleScript.DetectConsoleType(filename) != ConsoleType.Unknown;
 }
 

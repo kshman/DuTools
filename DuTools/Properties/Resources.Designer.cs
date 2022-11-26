@@ -97,6 +97,15 @@ namespace DuTools.Properties {
         }
         
         /// <summary>
+        ///   DuBook과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string DefaultBookName {
+            get {
+                return ResourceManager.GetString("DefaultBookName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   합시다과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
         internal static string DoIt {
@@ -173,6 +182,15 @@ namespace DuTools.Properties {
         }
         
         /// <summary>
+        ///   책 이름을 써주세요! 파일 이름으로 사용해요과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string NoBookName {
+            get {
+                return ResourceManager.GetString("NoBookName", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   [콘솔 스크립트가 없어요]과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
         internal static string NoConsoleScript {
@@ -187,6 +205,24 @@ namespace DuTools.Properties {
         internal static string NoConsoleScriptOpenFirst {
             get {
                 return ResourceManager.GetString("NoConsoleScriptOpenFirst", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   지원하지 않는 블로그 사이트예요!과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string NoSupportBlogSite {
+            get {
+                return ResourceManager.GetString("NoSupportBlogSite", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   URL 주소가 없어요과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string NoUrlAddress {
+            get {
+                return ResourceManager.GetString("NoUrlAddress", resourceCulture);
             }
         }
         

@@ -29,10 +29,10 @@
 		private void InitializeComponent()
 		{
 			this.panel1 = new System.Windows.Forms.Panel();
+			this.ScriptInfoText = new System.Windows.Forms.TextBox();
 			this.OutputText = new System.Windows.Forms.RichTextBox();
 			this.DoItButton = new Du.WinForms.BadakButton();
 			this.TitleLabel = new System.Windows.Forms.Label();
-			this.ScriptInfoText = new System.Windows.Forms.TextBox();
 			this.panel1.SuspendLayout();
 			this.SuspendLayout();
 			// 
@@ -49,6 +49,18 @@
 			this.panel1.Name = "panel1";
 			this.panel1.Size = new System.Drawing.Size(634, 384);
 			this.panel1.TabIndex = 0;
+			// 
+			// ScriptInfoText
+			// 
+			this.ScriptInfoText.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
+			this.ScriptInfoText.BackColor = System.Drawing.Color.Thistle;
+			this.ScriptInfoText.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+			this.ScriptInfoText.Location = new System.Drawing.Point(4, 46);
+			this.ScriptInfoText.Name = "ScriptInfoText";
+			this.ScriptInfoText.ReadOnly = true;
+			this.ScriptInfoText.Size = new System.Drawing.Size(627, 24);
+			this.ScriptInfoText.TabIndex = 3;
 			// 
 			// OutputText
 			// 
@@ -92,18 +104,6 @@
 			this.TitleLabel.TabIndex = 0;
 			this.TitleLabel.Text = "(스크립트가 없어여)";
 			// 
-			// ScriptInfoText
-			// 
-			this.ScriptInfoText.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
-            | System.Windows.Forms.AnchorStyles.Right)));
-			this.ScriptInfoText.BackColor = System.Drawing.Color.Thistle;
-			this.ScriptInfoText.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
-			this.ScriptInfoText.Location = new System.Drawing.Point(4, 46);
-			this.ScriptInfoText.Name = "ScriptInfoText";
-			this.ScriptInfoText.ReadOnly = true;
-			this.ScriptInfoText.Size = new System.Drawing.Size(627, 24);
-			this.ScriptInfoText.TabIndex = 3;
-			// 
 			// DuConsoleForm
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 18F);
@@ -113,8 +113,6 @@
 			this.Font = new System.Drawing.Font("Microsoft Sans Serif", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
 			this.Name = "DuConsoleForm";
 			this.Text = "DuConsoleForm";
-			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.DuConsoleForm_FormClosed);
-			this.Load += new System.EventHandler(this.DuConsoleForm_Load);
 			this.panel1.ResumeLayout(false);
 			this.panel1.PerformLayout();
 			this.ResumeLayout(false);

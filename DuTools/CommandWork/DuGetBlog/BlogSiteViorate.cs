@@ -2,21 +2,23 @@
 
 internal class BlogSiteViorate : IWebPageReader
 {
+	public async ValueTask DisposeAsync()
+	{
+		await Task.CompletedTask;
+	}
+
 	public WebPageParam CreateParam(string url)
 	{
 		var slash = url.LastIndexOf('/') + 1;
 		return new(url[..slash], Convert.ToInt64(url[slash..]));
 	}
 
-	public void Prepare()
+	public async Task Prepare()
 	{
+		await Task.CompletedTask;
 	}
 
-	public void Clean()
-	{
-	}
-
-	public void ReadPage(WebPageParam param, StreamWriter sw)
+	public async Task ReadPage(WebPageParam param, StreamWriter sw)
 	{
 		var url = $"{param.BaseUrl}{param.Index}";
 
@@ -65,16 +67,18 @@ internal class BlogSiteViorate : IWebPageReader
 				.Where(item => item > param.Index)
 				.ToList();
 
-			if (nexts.Count <= 0)
-				return;
-
-			nexts.Sort();
-			param.NextIndex = nexts[0];
+			if (nexts.Count > 0)
+			{
+				nexts.Sort();
+				param.NextIndex = nexts[0];
+			}
 		}
 		catch (Exception ex)
 		{
 			param.Text += Environment.NewLine;
 			param.Text += ex.Message;
 		}
+
+		await Task.CompletedTask;
 	}
 }

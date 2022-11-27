@@ -61,6 +61,24 @@ namespace DuTools.Properties {
         }
         
         /// <summary>
+        ///   작업을 시작해요!과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string BeginOfTask {
+            get {
+                return ResourceManager.GetString("BeginOfTask", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   블로그를 열 수가 없어요!과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string CannotOpenBlog {
+            get {
+                return ResourceManager.GetString("CannotOpenBlog", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   웹사이트를 열 수 없어요!\r\n과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
         internal static string CannotOpenWebsite {
@@ -115,11 +133,29 @@ namespace DuTools.Properties {
         }
         
         /// <summary>
+        ///   작업이 끝났어요!과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string EndOfTask {
+            get {
+                return ResourceManager.GetString("EndOfTask", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   파일이름: 과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
         internal static string FileNameWith {
             get {
                 return ResourceManager.GetString("FileNameWith", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   MsEdge 브라우저를 찾았어요: 과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string FoundMsEdgeWith {
+            get {
+                return ResourceManager.GetString("FoundMsEdgeWith", resourceCulture);
             }
         }
         
@@ -209,6 +245,15 @@ namespace DuTools.Properties {
         }
         
         /// <summary>
+        ///   MsEdge 브라우저가 없어요! 이 기능을 사용할 수 없어요!과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string NoMsEdgeNoWork {
+            get {
+                return ResourceManager.GetString("NoMsEdgeNoWork", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   지원하지 않는 블로그 사이트예요!과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
         internal static string NoSupportBlogSite {
@@ -254,7 +299,7 @@ namespace DuTools.Properties {
         }
         
         /// <summary>
-        ///   그밖의 확장자를 등록할까요?\r\n아직 정해진건 없어요!과(와) 유사한 지역화된 문자열을 찾습니다.
+        ///   그밖의 확장자를 등록할까요? 아직 정해진건 없어요!과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
         internal static string RegisterExtensionsOthers {
             get {

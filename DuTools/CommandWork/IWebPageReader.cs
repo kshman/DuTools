@@ -1,9 +1,8 @@
 ﻿namespace DuTools.CommandWork;
 
-internal interface IWebPageReader
+internal interface IWebPageReader : IAsyncDisposable
 {
 	WebPageParam CreateParam(string url);
-	void Prepare();
-	void Clean();
-	void ReadPage(WebPageParam param, StreamWriter sw);
+	Task Prepare();
+	Task ReadPage(WebPageParam param, StreamWriter sw);
 }

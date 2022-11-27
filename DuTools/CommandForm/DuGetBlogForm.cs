@@ -14,9 +14,28 @@ public partial class DuGetBlogForm : Form
 		BookNameText.Text = Resources.DefaultBookName;
 
 #if DEBUG
-		UrlText.Text = "https://viorate.tistory.com/576";
-		//UrlText.Text = "https://m.blog.naver.com/ishuca74/222928728040";
+		//UrlText.Text = "https://viorate.tistory.com/576";
+		UrlText.Text = "https://m.blog.naver.com/ishuca74/222928728040";
 #endif
+
+		// 엣지 체크
+		using (var rk = new RegKey("Microsoft\\Edge\\BLBeacon"))
+		{
+			if (rk.IsOpen)
+			{
+				var ver = rk.GetString("version");
+				if (ver != null)
+				{
+					ContentText.Text = $"{Resources.FoundMsEdgeWith}{ver}";
+					return;
+				}
+			}
+		}
+
+		ContentText.ForeColor = Color.White;
+		ContentText.BackColor = Color.LightPink;
+		ContentText.Text = Resources.NoMsEdgeNoWork;
+		EnableControls = false;
 	}
 
 	private async void DoItButton_Click(object sender, EventArgs e)
@@ -43,6 +62,11 @@ public partial class DuGetBlogForm : Form
 			SiteCombo.SelectedIndex = 2;
 			rs = new BlogSiteViorate();
 		}
+		else if (url.Contains("/m.blog.naver.com"))
+		{
+			SiteCombo.SelectedIndex = 1;
+			rs = new BlogSiteNaverMobile();
+		}
 		else
 		{
 			SiteCombo.SelectedIndex = 0;
@@ -55,40 +79,40 @@ public partial class DuGetBlogForm : Form
 
 		var param = rs.CreateParam(url);
 
-		await Task.Run(() =>
+		await Task.Run(async () =>
 		{
 			var filename = Path.Combine(
 				Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
 				$"{bookname}.txt");
 			using StreamWriter sw = new(filename, false, Encoding.UTF8);
 
-			rs.Prepare();
+			AddTaskList($"[{Resources.BeginOfTask}]");
+			await rs.Prepare();
 
 			while (true)
 			{
-				//if (param.Count > 5) break;
+#if DEBUG
+				if (param.Count > 5) break;
+#endif
 
 				param.Count++;
-				PagesLabel.Invoke(()=> PagesLabel.Text = param.Count.ToString());
+				PagesLabel.Invoke(() => PagesLabel.Text = param.Count.ToString());
 
 				param.BlogBeforeRead();
-				rs.ReadPage(param, sw);
+				await rs.ReadPage(param, sw);
 				param.BlogAfterRead(sw);
 
 				SetContentText(param.Text);
-				TaskList.Invoke(() =>
-				{ 
-					TaskList.Items.Add($"{param.Index} ➜ {param.Title}");
-					TaskList.TopIndex = TaskList.Items.Count - 1;
-				});
+				AddTaskList($"{param.Index} ➜ {param.Title}");
 
 				if (param.NextIndex < 0) break;
 
 				param.Index = param.NextIndex;
-				Task.Delay(20);
+				await Task.Delay(10);
 			}
 
-			rs.Clean();
+			AddTaskList($"[{Resources.EndOfTask}]");
+			await rs.DisposeAsync();
 		});
 
 		EnableControls = true;
@@ -99,7 +123,7 @@ public partial class DuGetBlogForm : Form
 		set
 		{
 			DoItButton.Enabled = value;
-			UrlText.Enabled=value;
+			UrlText.Enabled = value;
 			BookNameText.Enabled = value;
 			SiteCombo.Enabled = value;
 			ContentText.Enabled = value;
@@ -110,7 +134,8 @@ public partial class DuGetBlogForm : Form
 	{
 		ContentText.Invoke(() =>
 		{
-			ContentText.BackColor = Color.Red;
+			ContentText.ForeColor = Color.White;
+			ContentText.BackColor = Color.LightPink;
 			ContentText.Text = message;
 		});
 	}
@@ -119,8 +144,18 @@ public partial class DuGetBlogForm : Form
 	{
 		ContentText.Invoke(() =>
 		{
+			ContentText.ForeColor = Color.White;
 			ContentText.BackColor = Color.FromArgb(90, 90, 90);
 			ContentText.Text = message;
+		});
+	}
+
+	private void AddTaskList(string message)
+	{
+		TaskList.Invoke(() =>
+		{
+			TaskList.Items.Add(message);
+			TaskList.TopIndex = TaskList.Items.Count - 1;
 		});
 	}
 }

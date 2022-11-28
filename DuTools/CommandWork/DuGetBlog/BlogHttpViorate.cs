@@ -1,6 +1,6 @@
 ﻿namespace DuTools.CommandWork.DuGetBlog;
 
-internal class BlogSiteViorate : IWebPageReader
+internal class BlogHttpViorate : IWebPageReader
 {
 	public async ValueTask DisposeAsync()
 	{

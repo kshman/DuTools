@@ -144,6 +144,9 @@
   <data name="EndOfTask" xml:space="preserve">
     <value>작업이 끝났어요!</value>
   </data>
+  <data name="ExceptionNoTagInBlog" xml:space="preserve">
+    <value>블로그에서 태그를 찾을 수가 없어요!</value>
+  </data>
   <data name="FileNameWith" xml:space="preserve">
     <value>파일이름: </value>
   </data>

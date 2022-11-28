@@ -14,8 +14,8 @@ public partial class DuGetBlogForm : Form
 		BookNameText.Text = Resources.DefaultBookName;
 
 #if DEBUG
-		//UrlText.Text = "https://viorate.tistory.com/576";
-		UrlText.Text = "https://m.blog.naver.com/ishuca74/222928728040";
+		UrlText.Text = "https://viorate.tistory.com/4489";
+		//UrlText.Text = "https://m.blog.naver.com/ishuca74/222928728040";
 #endif
 
 		// 엣지 체크
@@ -26,7 +26,7 @@ public partial class DuGetBlogForm : Form
 				var ver = rk.GetString("version");
 				if (ver != null)
 				{
-					ContentText.Text = $"{Resources.FoundMsEdgeWith}{ver}";
+					ContentText.Text = $@"{Resources.FoundMsEdgeWith}{ver}";
 					return;
 				}
 			}
@@ -57,15 +57,17 @@ public partial class DuGetBlogForm : Form
 
 		IWebPageReader? rs;
 
-		if (url.Contains("/viorate.tistory.com"))
-		{
-			SiteCombo.SelectedIndex = 2;
-			rs = new BlogSiteViorate();
-		}
-		else if (url.Contains("/m.blog.naver.com"))
+		if (url.Contains("/m.blog.naver.com"))
 		{
 			SiteCombo.SelectedIndex = 1;
-			rs = new BlogSiteNaverMobile();
+			rs = new BlogPlayNaverM();
+		}
+		else if (url.Contains("/viorate.tistory.com"))
+		{
+			SiteCombo.SelectedIndex = 2;
+			rs = Configs.PreferPlaywright ?
+				new BlogPlayViorate() :
+				new BlogHttpViorate();
 		}
 		else
 		{
@@ -84,7 +86,7 @@ public partial class DuGetBlogForm : Form
 			var filename = Path.Combine(
 				Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
 				$"{bookname}.txt");
-			using StreamWriter sw = new(filename, false, Encoding.UTF8);
+			await using StreamWriter sw = new(filename, false, Encoding.UTF8);
 
 			AddTaskList($"[{Resources.BeginOfTask}]");
 			await rs.Prepare();
@@ -108,7 +110,7 @@ public partial class DuGetBlogForm : Form
 				if (param.NextIndex < 0) break;
 
 				param.Index = param.NextIndex;
-				await Task.Delay(10);
+				//await Task.Delay(10);
 			}
 
 			AddTaskList($"[{Resources.EndOfTask}]");

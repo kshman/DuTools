@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel;
-using System.Text.RegularExpressions;
 
 namespace DuTools;
 
@@ -14,6 +13,9 @@ internal static class Configs
 
 	public static string LastFolder { get; set; } = string.Empty;
 	public static bool PowerShell { get; set; }
+
+	public static bool PreferPlaywright { get; set; } = true;
+
 	public static List<CommandList> RecentlyCommand { get; } = new();
 	public static CommandList LastCommand { get; set; }
 
@@ -39,10 +41,8 @@ internal static class Configs
 		if (!rk.IsOpen)
 			return;
 
-		string? s;
-
 		// 윈도우 위치와 크기
-		s = rk.GetString("Window");
+		var s = rk.GetString("Window");
 		if (!string.IsNullOrWhiteSpace(s))
 		{
 			var ss = s.Split(',');
@@ -69,7 +69,10 @@ internal static class Configs
 		}
 
 		// 기본 파워쉘
-		PowerShell = rk.GetBool("PowerShell");
+		PowerShell = rk.GetBool("PowerShell", PowerShell);
+
+		// 플레이라이트 선화
+		PreferPlaywright = rk.GetBool("PreferPlaywright", PreferPlaywright);
 
 		// 최근 명령
 		s = rk.GetString("RecentlyCommand");
@@ -93,6 +96,10 @@ internal static class Configs
 
 		rk.SetString("Window",
 			$"{form.Location.X},{form.Location.Y},{form.Size.Width},{form.Size.Height}");
+		rk.SetBool("PowerShell", PowerShell);
+
+		rk.SetBool("PreferPlaywright", PreferPlaywright);
+
 		rk.SetEncodingString("LastFolder", LastFolder);
 		rk.SetString("RecentlyCommand", string.Join(',', RecentlyCommand));
 

@@ -142,6 +142,15 @@ namespace DuTools.Properties {
         }
         
         /// <summary>
+        ///   블로그에서 태그를 찾을 수가 없어요!과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string ExceptionNoTagInBlog {
+            get {
+                return ResourceManager.GetString("ExceptionNoTagInBlog", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   파일이름: 과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
         internal static string FileNameWith {

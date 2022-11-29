@@ -97,6 +97,15 @@ namespace DuTools.Properties {
         }
         
         /// <summary>
+        ///   [입력값을 확인하세요, 변환할 수 없어요]과(와) 유사한 지역화된 문자열을 찾습니다.
+        /// </summary>
+        internal static string CheckInputCannotConvert {
+            get {
+                return ResourceManager.GetString("CheckInputCannotConvert", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   스크립트 종료: 과(와) 유사한 지역화된 문자열을 찾습니다.
         /// </summary>
         internal static string ConsoleScriptExitWith {
@@ -204,6 +213,16 @@ namespace DuTools.Properties {
         internal static System.Drawing.Bitmap icon_cmd_DuGetBlog {
             get {
                 object obj = ResourceManager.GetObject("icon_cmd_DuGetBlog", resourceCulture);
+                return ((System.Drawing.Bitmap)(obj));
+            }
+        }
+        
+        /// <summary>
+        ///   System.Drawing.Bitmap 형식의 지역화된 리소스를 찾습니다.
+        /// </summary>
+        internal static System.Drawing.Bitmap icon_swap_arrow {
+            get {
+                object obj = ResourceManager.GetObject("icon_swap_arrow", resourceCulture);
                 return ((System.Drawing.Bitmap)(obj));
             }
         }

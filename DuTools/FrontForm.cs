@@ -82,9 +82,13 @@ public partial class FrontForm : Form
 				SetActiveForm(new CommandForm.DuGetBlogForm());
 				break;
 
+			case CommandList.Converter1:
+				AddRecentlyCommand(CommandList.Converter1);
+				SetActiveForm(new CommandForm.ConvertS1Form());
+				break;
+
 			case CommandList.OhNo:
 			case CommandList.Calculator:
-			case CommandList.Converter1:
 			default:
 				// 기본은 암것도 안 띄움
 				SetActiveForm(new CommandForm.OhNoForm());
@@ -183,7 +187,7 @@ public partial class FrontForm : Form
 	private void Converter1MenuItem_Click(object? sender, EventArgs e)
 	{
 		if (AddRecentlyCommand(CommandList.Converter1))
-			SetActiveForm(new CommandForm.OhNoForm());
+			SetActiveForm(new CommandForm.ConvertS1Form());
 	}
 
 	private void DuConsoleMenuItem_Click(object? sender, EventArgs e)

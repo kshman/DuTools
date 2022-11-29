@@ -129,6 +129,9 @@
   <data name="CannotReadConsoleScript" xml:space="preserve">
     <value>콘솔 스크립트를 읽을 수 없어요:</value>
   </data>
+  <data name="CheckInputCannotConvert" xml:space="preserve">
+    <value>[입력값을 확인하세요, 변환할 수 없어요]</value>
+  </data>
   <data name="ConsoleScriptExitWith" xml:space="preserve">
     <value>스크립트 종료: </value>
   </data>
@@ -165,6 +168,9 @@
   </data>
   <data name="icon_cmd_DuGetBlog" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\cmd_dugetblog.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
+  <data name="icon_swap_arrow" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\icon_swap_arrow.png;System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
   <data name="InvalidConsoleRuntime" xml:space="preserve">
     <value>콘솔 런타임이 잘못됐어요: </value>

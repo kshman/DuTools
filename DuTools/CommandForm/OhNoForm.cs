@@ -9,8 +9,7 @@ public partial class OhNoForm : Form
 		InitializeComponent();
 
 		label1.Font = new Font(base.Font.FontFamily, 48F,
-			((System.Drawing.FontStyle)((System.Drawing.FontStyle.Bold | System.Drawing.FontStyle.Italic))),
-			System.Drawing.GraphicsUnit.Point);
+			FontStyle.Bold | FontStyle.Italic, GraphicsUnit.Point);
 	}
 
 	private void RepoUrlLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)

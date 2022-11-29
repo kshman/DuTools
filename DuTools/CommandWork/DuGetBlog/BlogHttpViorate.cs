@@ -43,16 +43,12 @@ internal class BlogHttpViorate : IWebPageReader
 			var ediv = html.IndexOf("</div>", bdiv, StringComparison.Ordinal);
 			if (ediv < 0) throw new("끝 지점이 없어요");
 
-			var striphtml = html[bdiv..ediv];
-			striphtml = RexBlog.StripPOpen().Replace(striphtml, string.Empty);
-			striphtml = RexBlog.StripPClose().Replace(striphtml, "\n");
-			striphtml = RexBlog.StripBr().Replace(striphtml, "\n");
-			striphtml = RexBlog.StripTags().Replace(striphtml, string.Empty);
-			striphtml = striphtml.
-				Replace("\n\n\n", "\n\n").
-				Replace("\r\n\r\n\r\n", "\n\n").
-				Replace("&nbsp;", string.Empty);
-			param.Text = RexBlog.StripAmps().Replace(striphtml, "⊙");
+			var shtml = html[bdiv..ediv];
+			shtml = RexBlog.StripPOpen().Replace(shtml, string.Empty);
+			shtml = RexBlog.StripPClose().Replace(shtml, "\n");
+			shtml = shtml.ReplaceHtmlTag().Replace("\n\n\n", "\n\n");
+			//param.Text = RexBlog.StripAmps().Replace(shtml, "⊙");
+			param.Text = shtml;
 
 			//
 			bdiv = html.IndexOf("<div class=\"another_category another_category_color_gray\">", StringComparison.Ordinal);

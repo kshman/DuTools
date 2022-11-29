@@ -9,12 +9,12 @@ internal static class Configs
 {
 	private const string c_key = "PuruLive\\DuTools";
 
-	public static Font? TextBoxFont;
+	public static string? FixedFontName { get; private set; }
 
-	public static string LastFolder { get; set; } = string.Empty;
-	public static bool PowerShell { get; set; }
+	public static string LastFolder { get; private set; } = string.Empty;
+	public static bool PowerShell { get; private set; }
 
-	public static bool PreferPlaywright { get; set; } = true;
+	public static bool PreferPlaywright { get; private set; } = true;
 
 	public static List<CommandList> RecentlyCommand { get; } = new();
 	public static CommandList LastCommand { get; set; }
@@ -26,15 +26,15 @@ internal static class Configs
 	public static void AtOnLoad(Form form)
 	{
 		// 텍스트박스 글꼴
-		var fontnames = new[]
+		var font_names = new[]
 		{
 			"Bitstream Vera Sans Mono",
 			"Consolas",
 			"Tahoma",
 		};
-		var n = TestFont.IsInstalled(fontnames);
+		var n = TestFont.IsInstalled(font_names);
 		if (n >= 0)
-			TextBoxFont = new Font(fontnames[n], 9.0f, FontStyle.Regular, GraphicsUnit.Point);
+			FixedFontName = font_names[n];
 
 		//
 		using var rk = OpenKey();

@@ -5,6 +5,7 @@ global using Du.Data;
 global using Du.Globalization;
 global using Du.Platform;
 global using Du.WinForms;
+using DuTools.CommandForm;
 using DuTools.CommandWork.DuConsole;
 
 namespace DuTools;
@@ -30,7 +31,7 @@ internal static class Program
 		Application.Run(new FrontForm(cmd, obj));
 	}
 
-	public static CommandList GetCommand(string[] arg, ref string param)
+	private static CommandList GetCommand(string[] arg, ref string param)
 	{
 		foreach (var a in arg)
 		{
@@ -67,7 +68,7 @@ internal static class Program
 		return CommandList.OhNo;
 	}
 
-	public static bool TestDuConsole(string filename, ref object? obj)
+	private static bool TestDuConsole(string filename, ref object? obj)
 	{
 		if (string.IsNullOrWhiteSpace(filename))
 			return false;
@@ -81,14 +82,8 @@ internal static class Program
 			obj = cs;
 			return false;
 		}
-
-		var ps = new Process();
-		ps.StartInfo.FileName = Application.ExecutablePath;
-		ps.StartInfo.Arguments = $"-duconsole=\"{filename}\"";
-		ps.StartInfo.WorkingDirectory = Application.StartupPath;
-		ps.StartInfo.UseShellExecute = true;
-		ps.StartInfo.Verb = "runas";
-		ps.Start();
+		
+		DuConsoleForm.RunAs(filename);
 
 		return true;
 	}

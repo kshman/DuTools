@@ -13,6 +13,10 @@ public partial class DuConsoleForm : Form
 	{
 		InitializeComponent();
 
+		OutputText.Font = !string.IsNullOrEmpty(Configs.FixedFontName) ? 
+			new Font(Configs.FixedFontName, 11.0f, FontStyle.Regular, GraphicsUnit.Point) : 
+			new Font(FontFamily.GenericMonospace, 11.0f, FontStyle.Regular, GraphicsUnit.Point);
+
 		// 단순히 UI 초기화용이다. 실제로 스크립드 준비하는게 아님
 		PrepareScript();
 	}
@@ -77,7 +81,7 @@ public partial class DuConsoleForm : Form
 	*/
 	#endregion
 
-	public bool ReadScript(string filename)
+	private bool ReadScript(string filename)
 	{
 		var cs = ConsoleScript.FromFile(filename);
 
@@ -167,7 +171,7 @@ public partial class DuConsoleForm : Form
 		HotScript(dlg.FileName);
 	}
 
-	public void TaskIt()
+	private void TaskIt()
 	{
 		OutputText.Clear();
 
@@ -222,24 +226,24 @@ public partial class DuConsoleForm : Form
 
 	private void ProcessExited()
 	{
-		int exitcode;
+		int exit_code;
 
 		if (_ps == null)
-			exitcode = 0;
+			exit_code = 0;
 		else
 		{
 			//Task.Delay(100);
 			Thread.Sleep(100);
 
-			exitcode = _ps.ExitCode;
+			exit_code = _ps.ExitCode;
 
 			_ps.Close();
 			_ps = null;
 		}
 
 		// 당연하지만 종료가 메시지 보다 빨리 올 가능성 99.999%
-		LogLine(Color.Red, $"{Resources.ConsoleScriptExitWith}{exitcode}");
-		//Debug.WriteLine($"Exit code: {exitcode}");
+		LogLine(Color.Red, $"{Resources.ConsoleScriptExitWith}{exit_code}");
+		//Debug.WriteLine($"Exit code: {exit_code}");
 
 		//
 		DoItButton.Invoke(() => DoItButton.Enabled = true);
@@ -251,7 +255,7 @@ public partial class DuConsoleForm : Form
 		_cs.CleanUpTempContext();
 
 		// 탈출
-		if (!_cs.AutoExit || _cs.AutoExit && exitcode != 0)
+		if (!_cs.AutoExit || _cs.AutoExit && exit_code != 0)
 			return;
 
 		Task.Run(() =>
@@ -277,8 +281,7 @@ public partial class DuConsoleForm : Form
 	{
 		OutputText.Clear();
 
-		ReadScript(filename);
-		return PrepareScript();
+		return ReadScript(filename) && PrepareScript();
 	}
 
 	public static void RunAs(string filename)

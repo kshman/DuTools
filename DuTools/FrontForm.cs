@@ -5,7 +5,7 @@ namespace DuTools;
 
 public partial class FrontForm : Form
 {
-	private static FrontForm? _instance;
+	private static FrontForm? s_instance;
 
 	private readonly BadakFormWorker _bfw;
 
@@ -17,22 +17,22 @@ public partial class FrontForm : Form
 	private readonly List<BadakButton> _recent_buttons = new();
 	private readonly Dictionary<CommandList, EventHandler> _recent_events = new();
 
-	#region ÄÁ½ºÆ®·°ÅÍ
+	#region ì»¨ìŠ¤íŠ¸ëŸ­í„°
 
 	public static FrontForm Instance
 	{
 		get
 		{
-			if (_instance == null)
-				throw new InvalidOperationException("¸ÞÀÎ ÀÎ½ºÅÏ½º°¡ ¾ø´Ù´Ï ÀÌ°Ô ¹«½¼ ¸»ÀÌ¿À");
-			return _instance;
+			if (s_instance == null)
+				throw new InvalidOperationException("ë©”ì¸ ì¸ìŠ¤í„´ìŠ¤ê°€ ì—†ë‹¤ë‹ˆ ì´ê²Œ ë¬´ìŠ¨ ë§ì´ì˜¤");
+			return s_instance;
 		}
 	}
 
 	//
 	public FrontForm(CommandList cmd, object? obj = null)
 	{
-		_instance ??= this;
+		s_instance ??= this;
 
 		InitializeComponent();
 
@@ -60,7 +60,7 @@ public partial class FrontForm : Form
 	}
 	#endregion
 
-	#region Æû ±âº»
+	#region í¼ ê¸°ë³¸
 	private void FrontForm_Load(object sender, EventArgs e)
 	{
 		Configs.AtOnLoad(this);
@@ -86,7 +86,7 @@ public partial class FrontForm : Form
 			case CommandList.Calculator:
 			case CommandList.Converter1:
 			default:
-				// ±âº»Àº ¾Ï°Íµµ ¾È ¶ç¿ò
+				// ê¸°ë³¸ì€ ì•”ê²ƒë„ ì•ˆ ë„ì›€
 				SetActiveForm(new CommandForm.OhNoForm());
 				break;
 		}
@@ -104,7 +104,7 @@ public partial class FrontForm : Form
 
 	private void SystemButton_CloseOrder(object sender, EventArgs e)
 	{
-		// ¿¨... ÀÌ°Å ÇÊ¿ä¾ø´Éµ¥
+		// ì—¥... ì´ê±° í•„ìš”ì—†ëŠ¥ë°
 	}
 
 	private void TopPanel_MouseDown(object sender, MouseEventArgs e)
@@ -146,8 +146,8 @@ public partial class FrontForm : Form
 	{
 		if (e.KeyCode == Keys.Escape)
 		{
-			if (_active_form is CommandForm.DuConsoleForm ducform)
-				ducform.WaitProcess();
+			if (_active_form is CommandForm.DuConsoleForm form)
+				form.WaitProcess();
 			Close();
 		}
 	}
@@ -173,7 +173,7 @@ public partial class FrontForm : Form
 	}
 	#endregion
 
-	#region ¸Þ´º¾ÆÀÌÅÛ
+	#region ë©”ë‰´ì•„ì´í…œ
 	private void CalculatorMenuItem_Click(object? sender, EventArgs e)
 	{
 		if (AddRecentlyCommand(CommandList.Calculator))
@@ -198,7 +198,7 @@ public partial class FrontForm : Form
 			SetActiveForm(new CommandForm.DuGetBlogForm());
 	}
 
-	// È®ÀåÀÚ µî·Ï
+	// í™•ìž¥ìž ë“±ë¡
 	private void SettingRegisterExtensionsMenuItem_Click(object? sender, EventArgs e)
 	{
 		if (MsgBox(Resources.RegisterExtensionsDuConsole) == DialogResult.Yes)
@@ -210,11 +210,11 @@ public partial class FrontForm : Form
 
 		if (MsgBox(Resources.RegisterExtensionsOthers) == DialogResult.Yes)
 		{
-			// µý°Å ÇØ¾ßÇÔ
+			// ë”´ê±° í•´ì•¼í•¨
 		}
 	}
 
-	// ÃÖ½Å²¨ ¹öÆ° ´­¸²
+	// ìµœì‹ êº¼ ë²„íŠ¼ ëˆŒë¦¼
 	private void RecentlyButton_Click(object? sender, EventArgs e)
 	{
 		if (sender is not BadakButton btn)
@@ -225,25 +225,25 @@ public partial class FrontForm : Form
 			ev(sender, e);
 	}
 
-	public static DialogResult MsgBox(Form form, string message, MessageBoxButtons btns = MessageBoxButtons.YesNo,
+	public static DialogResult MsgBox(Form form, string message, MessageBoxButtons buttons = MessageBoxButtons.YesNo,
 		MessageBoxIcon icon = MessageBoxIcon.Question)
 	{
-		return MessageBox.Show(form, message, Resources.LetMeKnow, btns, icon);
+		return MessageBox.Show(form, message, Resources.LetMeKnow, buttons, icon);
 	}
 
-	public DialogResult MsgBox(string message, MessageBoxButtons btns = MessageBoxButtons.YesNo,
+	private DialogResult MsgBox(string message, MessageBoxButtons buttons = MessageBoxButtons.YesNo,
 		MessageBoxIcon icon = MessageBoxIcon.Question)
 	{
-		return MsgBox(this, message, btns, icon);
+		return MsgBox(this, message, buttons, icon);
 	}
 	#endregion
 
-	#region ÃÖ±Ù ¸í·É °ü·Ã
+	#region ìµœê·¼ ëª…ë ¹ ê´€ë ¨
 	private bool AddRecentlyCommand(CommandList recent_cmd)
 	{
-		var notsame = Configs.AddCommand(recent_cmd);
+		var not_same = Configs.AddCommand(recent_cmd);
 
-		if (notsame)
+		if (not_same)
 			RefreshRecentlyCommand();
 
 		if (_recent_buttons.Count > 0)
@@ -251,7 +251,7 @@ public partial class FrontForm : Form
 
 		CommandLabel.Text = recent_cmd.GetDescription();
 
-		return notsame;
+		return not_same;
 	}
 
 	private void RefreshRecentlyCommand()
@@ -261,10 +261,10 @@ public partial class FrontForm : Form
 		_recent_buttons.Clear();
 
 		var max_right = RunAsLabel.Location.X;
-		var recents = Configs.RecentlyCommand.ToArray().Reverse();
+		var recent = Configs.RecentlyCommand.ToArray().Reverse();
 		var x = 10;
 
-		foreach (var cmd in recents)
+		foreach (var cmd in recent)
 		{
 			if (x + 84 > max_right)
 				break;

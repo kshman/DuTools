@@ -44,8 +44,8 @@ internal static class PlaywrightSupp
 	private static async Task<string?> InternalInnerHtmlAsync(this IElementHandle eh)
 	{
 		var inner = await eh.InnerHTMLAsync();
-		var brcount = RexBlog.StripBr().Count(inner);
-		if (brcount == 0)
+		var br_count = RexBlog.StripBr().Count(inner);
+		if (br_count == 0)
 			return null;
 
 		inner = inner.ReplaceHtmlTag();

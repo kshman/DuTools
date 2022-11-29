@@ -41,7 +41,7 @@ public partial class DuGetBlogForm : Form
 	private async void DoItButton_Click(object sender, EventArgs e)
 	{
 		var url = UrlText.Text;
-		var bookname = BookNameText.Text;
+		var book_name = BookNameText.Text;
 
 		if (url.Length == 0)
 		{
@@ -49,7 +49,7 @@ public partial class DuGetBlogForm : Form
 			return;
 		}
 
-		if (bookname.Length == 0)
+		if (book_name.Length == 0)
 		{
 			SetContentError(Resources.NoBookName);
 			return;
@@ -85,7 +85,7 @@ public partial class DuGetBlogForm : Form
 		{
 			var filename = Path.Combine(
 				Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-				$"{bookname}.txt");
+				$"{book_name}.txt");
 			await using StreamWriter sw = new(filename, false, Encoding.UTF8);
 
 			AddTaskList($"[{Resources.BeginOfTask}]");

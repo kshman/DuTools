@@ -186,7 +186,11 @@ public partial class ConvertS1Form : Form
 		var new_mode = (ConvTextMode)(mode % 2 == 0 ? mode + 1 : mode - 1);
 
 		var s = InternalConvText(_conv_text_mode, o);
-		if (s == null) return;
+		if (s == null)
+		{
+			ConvToText.Text = Resources.CheckInputCannotConvert;
+			return;
+		}
 
 		ConvFromText.Text = s;
 		//ConvToText.Text = o;
@@ -211,13 +215,11 @@ public partial class ConvertS1Form : Form
 			case ConvTextMode.DuDcmpr:
 				DuDcmprRadio.Checked = true;
 				break;
-			default:
-				break;
 		}
 	}
 }
 
-internal enum ConvTextMode : int
+internal enum ConvTextMode
 {
 	DuEnc = 0,
 	DuDec = 1,

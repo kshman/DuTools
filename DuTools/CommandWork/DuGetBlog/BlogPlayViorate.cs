@@ -4,7 +4,7 @@ namespace DuTools.CommandWork.DuGetBlog;
 
 internal class BlogPlayViorate : BlogPlayBase
 {
-	public override async Task ReadPage(WebPageParam param, StreamWriter sw)
+	public override async Task ReadPage(WebPageParam param)
 	{
 		if (_pw == null || _br == null || _page == null)
 			return;
@@ -16,7 +16,7 @@ internal class BlogPlayViorate : BlogPlayBase
 			await _page.GotoAsync(url);
 
 			var epci = await _page.QuerySelectorAsync("div.post-cover div.inner");
-			if (epci == null) throw new Exception(Resources.ExceptionNoTagInBlog);
+			if (epci == null) throw new (Resources.ExceptionNoTagInBlog);
 
 			//
 			var sctg = await epci.QueryTextContentAsync("span.category");
@@ -28,16 +28,16 @@ internal class BlogPlayViorate : BlogPlayBase
 
 			//
 			var eec = await _page.QuerySelectorAsync("div.entry-content");
-			if (eec == null) throw new Exception(Resources.ExceptionNoTagInBlog);
+			if (eec == null) throw new (Resources.ExceptionNoTagInBlog);
 
 			var earticle = await eec.QuerySelectorAsync("div");
-			if (earticle == null) throw new Exception(Resources.ExceptionNoTagInBlog);
+			if (earticle == null) throw new (Resources.ExceptionNoTagInBlog);
 
 			param.Text = await earticle.QueryAllTextSelectorAsync("p");
 
 			//
 			var eac = await eec.QuerySelectorAsync("div.another_category");
-			if (eac == null) throw new Exception(Resources.ExceptionNoTagInBlog);
+			if (eac == null) throw new(Resources.ExceptionNoTagInBlog);
 
 			/*var eas = await eac.QuerySelectorAllAsync("a");
 			foreach (var ea in eas)

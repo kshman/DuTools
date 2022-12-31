@@ -101,6 +101,10 @@ public partial class ConvertS1Form : Form
 			if (!char.IsBetween(e.KeyChar, '0', '1'))
 				e.Handled = true;
 		}
+		else
+		{
+            Debug.WriteLine("오노... 알 수 없는 진수");
+		}
 	}
 
 	private void TextBox_Click(object sender, EventArgs e)
@@ -193,7 +197,6 @@ public partial class ConvertS1Form : Form
 		}
 
 		ConvFromText.Text = s;
-		//ConvToText.Text = o;
 
 		switch (new_mode)
 		{

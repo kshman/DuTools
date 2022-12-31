@@ -1,4 +1,5 @@
-﻿using DuTools.CommandWork;
+﻿using System.Security.Policy;
+using DuTools.CommandWork;
 using DuTools.CommandWork.DuGetBlog;
 using DuTools.Properties;
 
@@ -6,158 +7,204 @@ namespace DuTools.CommandForm;
 
 public partial class DuGetBlogForm : Form
 {
-	public DuGetBlogForm()
-	{
-		InitializeComponent();
+    public DuGetBlogForm()
+    {
+        InitializeComponent();
 
-		SiteCombo.SelectedIndex = 0;
-		BookNameText.Text = Resources.DefaultBookName;
+        SiteCombo.SelectedIndex = 0;
+        BookNameText.Text = Resources.DefaultBookName;
 
 #if DEBUG
-		UrlText.Text = "https://viorate.tistory.com/4489";
-		//UrlText.Text = "https://m.blog.naver.com/ishuca74/222928728040";
+        string[] testurls =
+        {
+            "https://viorate.tistory.com/4489", // 비오라테
+			"https://m.blog.naver.com/ishuca74/222928728040", // 네버
+			"https://m.blog.naver.com/jinho8895/222482426856", // 네버 인데 안에 또 추가
+        };
+        UrlText.Text = testurls[2];
+        BinbCheck.Checked = true;
 #endif
 
-		// 엣지 체크
-		using (var rk = new RegKey("Microsoft\\Edge\\BLBeacon"))
-		{
-			if (rk.IsOpen)
-			{
-				var ver = rk.GetString("version");
-				if (ver != null)
-				{
-					ContentText.Text = $@"{Resources.FoundMsEdgeWith}{ver}";
-					return;
-				}
-			}
-		}
+        // 엣지 체크
+        using (var rk = new RegKey("Microsoft\\Edge\\BLBeacon"))
+        {
+            if (rk.IsOpen)
+            {
+                var ver = rk.GetString("version");
+                if (ver != null)
+                {
+                    ContentText.Text = $@"{Resources.FoundMsEdgeWith}{ver}";
+                    return;
+                }
+            }
+        }
 
-		ContentText.ForeColor = Color.White;
-		ContentText.BackColor = Color.LightPink;
-		ContentText.Text = Resources.NoMsEdgeNoWork;
-		EnableControls = false;
-	}
+        ContentText.ForeColor = Color.White;
+        ContentText.BackColor = Color.LightPink;
+        ContentText.Text = Resources.NoMsEdgeNoWork;
+        SetEnableControls(false);
+    }
 
-	private async void DoItButton_Click(object sender, EventArgs e)
-	{
-		var url = UrlText.Text;
-		var book_name = BookNameText.Text;
+    private async void DoItButton_Click(object sender, EventArgs e)
+    {
+        var book_name = BookNameText.Text;
+        if (book_name.Length == 0)
+        {
+            SetContentError(Resources.NoBookName);
+            return;
+        }
 
-		if (url.Length == 0)
-		{
-			SetContentError(Resources.NoUrlAddress);
-			return;
-		}
+        var blogtype = DetectBlogType(UrlText.Text, true);
+        IWebPageReader? rs = GetWebPageReader(blogtype);
+        if (rs == null)
+            return;
 
-		if (book_name.Length == 0)
-		{
-			SetContentError(Resources.NoBookName);
-			return;
-		}
+        SetEnableControls(false);
+        TaskList.Items.Clear();
 
-		IWebPageReader? rs;
+        var param = rs.CreateParam(UrlText.Text);
+        param.ParseLink = BinbCheck.Checked;
 
-		if (url.Contains("/m.blog.naver.com"))
-		{
-			SiteCombo.SelectedIndex = 1;
-			rs = new BlogPlayNaverM();
-		}
-		else if (url.Contains("/viorate.tistory.com"))
-		{
-			SiteCombo.SelectedIndex = 2;
-			rs = Configs.PreferPlaywright ?
-				new BlogPlayViorate() :
-				new BlogHttpViorate();
-		}
-		else
-		{
-			SiteCombo.SelectedIndex = 0;
-			SetContentError(Resources.NoSupportBlogSite);
-			return;
-		}
+        await Task.Run(async () =>
+        {
+            var filename = Path.Combine(
+                Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+                $"{book_name}.txt");
+            await using StreamWriter sw = new(filename, false, Encoding.UTF8);
 
-		EnableControls = false;
-		TaskList.Items.Clear();
+            AddTaskList($"[{Resources.BeginOfTask}]");
+            await rs.Prepare();
 
-		var param = rs.CreateParam(url);
-
-		await Task.Run(async () =>
-		{
-			var filename = Path.Combine(
-				Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
-				$"{book_name}.txt");
-			await using StreamWriter sw = new(filename, false, Encoding.UTF8);
-
-			AddTaskList($"[{Resources.BeginOfTask}]");
-			await rs.Prepare();
-
-			while (true)
-			{
+            while (true)
+            {
 #if DEBUG
-				if (param.Count > 5) break;
+                if (param.Count > 5) break;
 #endif
 
-				param.Count++;
-				PagesLabel.Invoke(() => PagesLabel.Text = param.Count.ToString());
+                param.Count++;
+                PagesLabel.Invoke(() => PagesLabel.Text = param.Count.ToString());
 
-				param.BlogBeforeRead();
-				await rs.ReadPage(param, sw);
-				param.BlogAfterRead(sw);
+                if (BinbCheck.Checked)
+                {
+                    param.BlogBeforeRead();
+                    await rs.ReadPage(param);
 
-				SetContentText(param.Text);
-				AddTaskList($"{param.Index} ➜ {param.Title}");
+                    SetContentText(param.Text);
+                    AddTaskList($"{param.Index} ➜ {param.Title}");
+                    AddTaskList(param.Links.Count > 0 ?
+                        $"    [링크 {param.Links.Count}개 찾았어요]" :
+                        "     [링크가 없어요]");
+                }
+                else
+                {
+                    param.BlogBeforeRead();
+                    await rs.ReadPage(param);
+                    param.BlogAfterRead(sw);
 
-				if (param.NextIndex < 0) break;
+                    SetContentText(param.Text);
+                    AddTaskList($"{param.Index} ➜ {param.Title}");
+                }
 
-				param.Index = param.NextIndex;
-				//await Task.Delay(10);
-			}
+                if (param.NextIndex < 0) break;
 
-			AddTaskList($"[{Resources.EndOfTask}]");
-			await rs.DisposeAsync();
-		});
+                param.Index = param.NextIndex;
+                //await Task.Delay(10);
+            }
 
-		EnableControls = true;
-	}
+            AddTaskList($"[{Resources.EndOfTask}]");
+            await rs.DisposeAsync();
+        });
 
-	private bool EnableControls
-	{
-		set
-		{
-			DoItButton.Enabled = value;
-			UrlText.Enabled = value;
-			BookNameText.Enabled = value;
-			SiteCombo.Enabled = value;
-			ContentText.Enabled = value;
-		}
-	}
+        SetEnableControls(true);
+    }
 
-	private void SetContentError(string message)
-	{
-		ContentText.Invoke(() =>
-		{
-			ContentText.ForeColor = Color.White;
-			ContentText.BackColor = Color.LightPink;
-			ContentText.Text = message;
-		});
-	}
+    private void SetEnableControls(bool value)
+    {
+        DoItButton.Enabled = value;
+        UrlText.Enabled = value;
+        BookNameText.Enabled = value;
+        SiteCombo.Enabled = value;
+        ContentText.Enabled = value;
+    }
 
-	private void SetContentText(string message)
-	{
-		ContentText.Invoke(() =>
-		{
-			ContentText.ForeColor = Color.White;
-			ContentText.BackColor = Color.FromArgb(90, 90, 90);
-			ContentText.Text = message;
-		});
-	}
+    private void SetContentError(string message)
+    {
+        ContentText.Invoke(() =>
+        {
+            ContentText.ForeColor = Color.White;
+            ContentText.BackColor = Color.LightPink;
+            ContentText.Text = message;
+        });
+    }
 
-	private void AddTaskList(string message)
-	{
-		TaskList.Invoke(() =>
-		{
-			TaskList.Items.Add(message);
-			TaskList.TopIndex = TaskList.Items.Count - 1;
-		});
-	}
+    private void SetContentText(string message)
+    {
+        ContentText.Invoke(() =>
+        {
+            ContentText.ForeColor = Color.White;
+            ContentText.BackColor = Color.FromArgb(90, 90, 90);
+            ContentText.Text = message;
+        });
+    }
+
+    private void AddTaskList(string message)
+    {
+        TaskList.Invoke(() =>
+        {
+            TaskList.Items.Add(message);
+            TaskList.TopIndex = TaskList.Items.Count - 1;
+        });
+    }
+
+    private void UrlText_TextChanged(object sender, EventArgs e)
+    {
+        DetectBlogType(UrlText.Text);
+    }
+
+    private BlogType DetectBlogType(string s, bool alsoSetError = false)
+    {
+        if (alsoSetError && string.IsNullOrWhiteSpace(s))
+        {
+            SetContentError(Resources.NoUrlAddress);
+            return BlogType.Unknown;
+        }
+
+        var b = s.ToBlogType();
+        SiteCombo.SelectedIndex = (int)b;
+
+        if (alsoSetError && b == BlogType.Unknown)
+            SetContentError(Resources.NoSupportBlogSite);
+
+        return b;
+    }
+
+    private static IWebPageReader? GetWebPageReader(BlogType b)
+    {
+        /*
+        if (BinbCheck.Checked)
+        {
+            return b switch
+            {
+                BlogType.TistoryViolate => new BlogHttpViorate(),
+                BlogType.NaverBlog => new BlogHttpNaverM(),
+                _ => null,
+            };
+        }
+        else
+        {
+            return b switch
+            {
+                BlogType.TistoryViolate => Configs.PreferPlaywright ? new BlogPlayViorate() : new BlogHttpViorate(),
+                BlogType.NaverBlog => new BlogPlayNaverM(),
+                _ => null,
+            };
+        }
+        */
+        return b switch
+        {
+            BlogType.TistoryViolate => Configs.PreferPlaywright ? new BlogPlayViorate() : new BlogHttpViorate(),
+            BlogType.NaverBlog => new BlogPlayNaverM(),
+            _ => null,
+        };
+    }
 }

@@ -4,5 +4,5 @@ internal interface IWebPageReader : IAsyncDisposable
 {
 	WebPageParam CreateParam(string url);
 	Task Prepare();
-	Task ReadPage(WebPageParam param, StreamWriter sw);
+	Task ReadPage(WebPageParam param/*, StreamWriter sw*/);
 }

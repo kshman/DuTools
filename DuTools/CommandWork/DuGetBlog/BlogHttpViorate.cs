@@ -18,7 +18,7 @@ internal class BlogHttpViorate : IWebPageReader
 		await Task.CompletedTask;
 	}
 
-	public async Task ReadPage(WebPageParam param, StreamWriter sw)
+	public async Task ReadPage(WebPageParam param)
 	{
 		var url = $"{param.BaseUrl}{param.Index}";
 

@@ -40,7 +40,7 @@ internal abstract class BlogPlayBase : IWebPageReader
 		_page = await _br.NewPageAsync();
 	}
 
-	public virtual async Task ReadPage(WebPageParam param, StreamWriter sw)
+	public virtual async Task ReadPage(WebPageParam param)
 	{
 		await Task.CompletedTask;
 		throw new AmbiguousImplementationException("Implement this method");

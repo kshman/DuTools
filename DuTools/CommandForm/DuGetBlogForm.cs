@@ -15,13 +15,14 @@ public partial class DuGetBlogForm : Form
         BookNameText.Text = Resources.DefaultBookName;
 
 #if DEBUG
-        string[] testurls =
+        string[] testUrls =
         {
             "https://viorate.tistory.com/4489", // 비오라테
 			"https://m.blog.naver.com/ishuca74/222928728040", // 네버
 			"https://m.blog.naver.com/jinho8895/222482426856", // 네버 인데 안에 또 추가
+            "https://m.blog.naver.com/saiversta/221793987072", // 네버 한넬로네
         };
-        UrlText.Text = testurls[2];
+        UrlText.Text = testUrls[3];
         BinbCheck.Checked = true;
 #endif
 
@@ -54,8 +55,8 @@ public partial class DuGetBlogForm : Form
             return;
         }
 
-        var blogtype = DetectBlogType(UrlText.Text, true);
-        IWebPageReader? rs = GetWebPageReader(blogtype);
+        var blogType = DetectBlogType(UrlText.Text, true);
+        IWebPageReader? rs = GetWebPageReader(blogType);
         if (rs == null)
             return;
 
